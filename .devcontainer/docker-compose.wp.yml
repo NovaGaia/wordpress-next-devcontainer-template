@@ -1,0 +1,26 @@
+version: '3.8'
+# https://github.com/docker/awesome-compose/tree/master/official-documentation-samples/wordpress/
+
+services:
+  web:
+    image: nginx:latest
+    ports:
+      - '8080:80'
+    volumes:
+      - ../packages/back-wp:/var/www/html
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - wordpress
+    networks:
+      - synapsysdigital_node_net
+  wordpress:
+    build: docker/php-fpm
+    volumes:
+      - ../packages/back-wp:/var/www/html
+    env_file: wp.env
+    restart: always
+    networks:
+      - synapsysdigital_node_net
+
+networks:
+  synapsysdigital_node_net:

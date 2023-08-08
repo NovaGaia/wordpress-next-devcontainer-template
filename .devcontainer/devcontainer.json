@@ -1,0 +1,108 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node
+{
+  "name": "Projet (WordPress/NextJS/TailwindCSS)",
+  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+  // "image": "mcr.microsoft.com/devcontainers/javascript-node:1-18-bullseye",
+  "dockerComposeFile": ["docker-compose.yml", "docker-compose.wp.yml"],
+  // version sans WordPress
+  // "dockerComposeFile": ["docker-compose.yml"],
+  // la valeur de service doit être la même que le nom du service dans le docker-compose.yml
+  "service": "node",
+  "workspaceFolder": "/workspace",
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/rio/features/chezmoi:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [8080, 3000],
+  "portsAttributes": {
+    "8080": {
+      "label": "WordPress",
+      "onAutoForward": "notify"
+    },
+    "3000": {
+      "label": "NextJS",
+      "onAutoForward": "notify"
+    }
+  },
+
+  // Use 'initializeCommand' A command string or list of command arguments to run on the host machine before the container is created.
+  "initializeCommand": {},
+
+  // Use 'postStartCommand' to run commands each time the container is successfully started..
+  // https://www.kenmuse.com/blog/avoiding-dubious-ownership-in-dev-containers/
+  "postStartCommand": {
+    "git.config.safe.directory": "git config --global --add safe.directory ${containerWorkspaceFolder}",
+    "git.config.pull.rebase": "git config pull.rebase false",
+    "custom-cmd": "sh /workspace/.devcontainer/postStartCommand/custom.sh"
+  },
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": {
+    "chown-folders": "sh /workspace/.devcontainer/postCreateCommand/_chown-folders.sh",
+    "add-ssh-keys": "sh /workspace/.devcontainer/postCreateCommand/_add-ssh-keys.sh",
+    "pnpm install": "npm install -g pnpm",
+    "custom-cmd": "sh /workspace/.devcontainer/postCreateCommand/custom.sh"
+  },
+
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "oderwat.indent-rainbow",
+        "esbenp.prettier-vscode",
+        "amatiasq.sort-imports",
+        "vscode-icons-team.vscode-icons",
+        "dbaeumer.vscode-eslint",
+        "formulahendry.auto-rename-tag",
+        "mutantdino.resourcemonitor",
+        "yzhang.markdown-all-in-one",
+        "adam-bender.commit-message-editor",
+        "mhutchie.git-graph",
+        "eamodio.gitlens",
+        "felixfbecker.php-pack",
+        "wordpresstoolbox.wordpress-toolbox",
+        "johnbillion.vscode-wordpress-hooks",
+        "GitHub.copilot",
+        "bradlc.vscode-tailwindcss",
+        "kamikillerto.vscode-colorize",
+        "bmewburn.vscode-intelephense-client"
+      ],
+      "settings": {
+        "dotfiles.targetPath": "~/dotfiles",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash"
+          },
+          "zsh": {
+            "path": "/bin/zsh",
+            "icon": "terminal-powershell"
+          }
+        },
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "editor.formatOnSave": true,
+        "prettier.prettierPath": "./node_modules/prettier",
+        "php.suggest.basic": false // avoids duplicate autocomplete
+      }
+    }
+  },
+
+  "mounts": [
+    "source=project-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume",
+    "source=project-pnpm-store,target=${containerWorkspaceFolder}/.pnpm-store,type=volume",
+    // Persisting user profile https://code.visualstudio.com/docs/devcontainers/tips-and-tricks#_persisting-user-profile
+    "source=profile,target=/root,type=volume",
+    "target=/root/.vscode-server,type=volume"
+  ],
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+  // "remoteUser": "root"
+  // "remoteUser": "vscode"
+  "remoteUser": "node"
+}

@@ -1,0 +1,6 @@
+# .gitignore
+.DS_Store
+node_modules
+packages/back-wp/wp-content/uploads/*
+.pnpm-store
+.devcontainer/wp.env
